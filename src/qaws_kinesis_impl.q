@@ -5,7 +5,7 @@ request:{[Region;Operation;Body;Decode]
   JBody: .awsutils.to_json Body;
   Headers: headers[Config;Operation;JBody];
   ret:request_retry[Config;Headers;JBody;Decode;1];
-  .j.k ret`body
+  $[""~ret `body;"";.j.k ret`body]
  };
 
 request_retry:{[Config;Headers;Body;Decode;Attempt]

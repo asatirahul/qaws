@@ -89,21 +89,18 @@ iso_8601_datetime:{
   ssr[?[b  in ".:";" ";b:-4_string a];" ";""],"Z"
  };
 
-hash:{[Data]
-  hex_encode .cryptoq.sha256 Data
-  };
+hash:{[Data]  hex_encode .cryptoq.sha256 Data  };
 
 hex_encode:{[Data]
-  hex:("0123456789abcdef");
-  raze ?[1=count@'h;"0",'h;h:hex 16 vs/: `int$Data]
+  if[4<>abs type d:Data; d:"x"$Data]; / if Data is not hex then convert it to hex
+  raze string d
+  /hex:("0123456789abcdef");
+  /raze ?[1=count@'h;"0",'h;h:hex 16 vs/: `int$Data]
   };
 
-trimall:{[Data]
-  a::Data;
-  (" "sv"  "vs)/[trim(Data)]
- };
+trimall:{[Data] (" "sv"  "vs)/[trim(Data)] };
 
-/ fetches host from region URL
+/ get host from region URL
 / aws endpoint changes according to region. For ex:
 / us-west-2 : s3.us-west-2.amazonaws.com
 / cn-north-1: s3.cn-north-1.amazonaws.com.cn
@@ -184,7 +181,7 @@ get_aws_config:{[Region]
 / Checks for assume role expiration for config in cache. If its expired then genrates new creds and update the cache.
 / @param Region (String) Region name . "us-west-2"
 update_aws_config:{[Region]
-  if[USER_CONFIG[Region][`expiration]<.z.z; USER_CONFIG[`Region]:USER_CONFIG[`Region],get_credentials ()!()];  / token exoired, update credentials
+  if[USER_CONFIG[Region][`expiration]<.z.z; USER_CONFIG[Region]:USER_CONFIG[Region],get_credentials ()!()];  / token exoired, update credentials
  };
 
 / Get aws config for specified region
