@@ -5,6 +5,7 @@
 AWS_REGION:"";
 DEFAULT_CONTENT_TYPE: "application/x-www-form-urlencoded; charset=utf-8";
 USER_CONFIG:()!(); / stores user aws configs per region
+i:0;
 / ---------------------------------
 /    OS CONSTANTS
 / ---------------------------------
@@ -109,10 +110,21 @@ trimall:{[Data] (" "sv"  "vs)/[trim(Data)] };
 / @param Host (String) Host name/URL
 / @return (String) region
 aws_region_from_host:{[Host]
+  / if["s3"~Host 0 1;:aws_s3_region_from_host Host];
   Tokens : "." vs Host;
   if[any Host like/: ("streams.dynamodb.*";"metering.marketplace.*";"entitlement.marketplace.*"); : Tokens 2];
   if[4<=count Tokens;:Tokens 1];
   default_config_get[AWS_REGION_OS;AWS_REGION;"us-east-1"]
+ };
+
+aws_s3_region_from_host:{[Host]
+  Tokens : "." vs Host;
+  default:"us-east-1";
+  if[4<=count Tokens;:Tokens 1]; / s3.eu-central-1.amazonaws.com
+  if[not 3=count Tokens;:default];
+  / len 3 cases
+  if[Tokens[0] in ("s3";"s3-external-1");:default] / s3.amazonaws.com , s3-external-1.amazonaws.com
+  3_Tokens 0 / s3-us-east-1.amazonaws.com
  };
 
 / first try to read operating system variable - if set then return its value else
@@ -163,7 +175,7 @@ aws_request:{[Method; Addr; Path; Params; Service; Headers; Config]
 aws_request_form:{[Method;Addr;Path;Query;Headers]
   ct:`$"content-type";
   headers:enlist[ct]_Headers;
-  ret:.qhttp.hpost[Addr`host;Path;headers;Headers ct;Query];
+  ret:.qhttp.hpost[1b;Addr`host;Path;headers;Headers ct;Query];
   ret `body
  };
 
@@ -258,6 +270,15 @@ default_config_region_services:{
 / @param Service (String) Service name
 / @param Region (String) Region Name
 / @return (String) host name
-service_host:{[Service;Region]  "." sv (Service;Region;"amazonaws.com") };
+service_host:{[Service;Region]
+  $["s3"~Service;service_host_s3 Region;"." sv (Service;Region;"amazonaws.com") ]
+ };
+
+service_host_s3:{[Region]
+  if["us-east-1"~Region;:"s3-external-1.amazonaws.com"];
+  if["cn-north-1"~Region;:"s3.cn-north-1.amazonaws.com.cn"];
+  if["us-gov-west-1"~Region;:"s3-fips-us-gov-west-1.amazonaws.com"];
+  "s3-",Region,".amazonaws.com"
+ };
 
 \d .

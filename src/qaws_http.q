@@ -1,8 +1,9 @@
 \d .qaws_http
-/ TODO : use encode slash
+/ TODO : use encode slash. Same as .h.hu?
 / AWS Link: https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-query-string-auth.html
 uri_encode_p:{[input; encodeSlash]
   char_set: .Q.a,.Q.A,.Q.n,"_-.~";
+  if[11=abs type input;input:string input];
   raze ?[input in char_set;enlist each input;"%",/:upper string "x"$input]
  };
 
@@ -17,10 +18,10 @@ uri_encode:uri_encode_p[;0];
 make_query_string:{[QParams; EmptyAssign]
   a:("";"=") EmptyAssign;
   v:?[""~/:vq;a,/:vq;"=",/:uri_encode each vq:value QParams];
-  "&" sv key[QParams],'v
+  "&" sv ?[11=abs type k;string k;k:key QParams] ,'v
  };
 
 / FIX ME
-url_encode_loose:{x};
+url_encode_loose:{x}; / [Path] .h.hu Path};
 
 \d .

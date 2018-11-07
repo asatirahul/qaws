@@ -5,13 +5,13 @@ request:{[Region;Operation;Body;Decode]
   JBody: .awsutils.to_json Body;
   Headers: headers[Config;Operation;JBody];
   ret:request_retry[Config;Headers;JBody;Decode;1];
-  $[""~ret `body;"";.j.k ret`body]
+  `status`result!(ret`status;$[""~ret`body;"";.j.k ret`body])
  };
 
 request_retry:{[Config;Headers;Body;Decode;Attempt]
   /Host: url Config;
   Host: raze Config[`kinesis_host],((":",p);"")p:string 80=Config[`kinesis_port];
-  .qhttp.hpost[Host;"";Headers;"application/x-amz-json-1.1";Body]
+  .qhttp.hpost[1b;Host;"";Headers;"application/x-amz-json-1.1";Body]
  };
 
 /dict;str;str
