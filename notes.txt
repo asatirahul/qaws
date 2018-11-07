@@ -1,0 +1,18 @@
+TODO:
+- xml Error handling
+- performace for config
+- cred from os var
+- profile name for os variable
+- S3 create bucket fix location constraint case- if not given use us-east-1
+- S3 bucket file use S3REGION in all functions
+
+
+ToCheck:
+- signv4 task1 step 8 (https://docs.aws.amazon.com/general/latest/gr/sigv4-calculate-signature.html)
+
+To Think:
+-can we separate 2 returns values of function canonical_request
+
+Reminders:
+- aws_request_form and aws_request_form_raw is  partially implemented
+-service_host partial implemented
